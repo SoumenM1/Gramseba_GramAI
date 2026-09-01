@@ -1,0 +1,22 @@
+from fastapi import FastAPI
+from app.api.router import api_router
+from app.core.config import settings
+from app.core.logging import setup_logging
+
+setup_logging()
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="GramAI - AI assistant for Grambazer",
+)
+
+app.include_router(api_router)
+
+
+@app.get("/")
+async def root():
+    return {
+        "message": "GramAI API is running",
+        "version": settings.APP_VERSION,
+    }
