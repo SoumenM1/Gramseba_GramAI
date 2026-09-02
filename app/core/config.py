@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str | None = None
 
     OLLAMA_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.2"
+    OLLAMA_MODEL: str = "phi3"
 
     OPENAI_API_KEY: str | None = None
     OPENAI_MODEL: str = "gpt-4o-mini"

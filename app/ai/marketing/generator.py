@@ -1,4 +1,5 @@
 import json
+import re
 
 from app.ai.llm.client import LLMClient
 from app.schemas.marketing import (
@@ -8,7 +9,6 @@ from app.schemas.marketing import (
 
 
 class MarketingGenerator:
-
     def __init__(self):
         self.llm = LLMClient()
 
@@ -42,13 +42,22 @@ Return JSON:
 """
 
         response = await self.llm.generate(prompt)
-
         try:
-            data = json.loads(response)
+            cleaned_response = response.strip()
+
+            if cleaned_response.startswith("```"):
+                cleaned_response = re.sub(
+                    r"^```(?:json)?\s*|\s*```$",
+                    "",
+                    cleaned_response,
+                    flags=re.IGNORECASE,
+                ).strip()
+
+            data = json.loads(cleaned_response)
 
         except json.JSONDecodeError:
             data = {
-                "title": request.product_name,
+                "title": response,
                 "description": response,
                 "short_description": response[:150],
                 "hashtags": [],
@@ -68,15 +77,3 @@ Create marketing content from:
 {message}
 """
         )
-''',
-
-    "app/ai/marketing/templates.py": '''
-MARKETING_TEMPLATE = """
-Product: {product_name}
-
-Create:
-Title:
-Short Description:
-Description:
-Hashtags:
-"""

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from app.services.seller_service import SellerService
 
 router = APIRouter()

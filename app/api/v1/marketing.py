@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from app.schemas.marketing import (
     MarketingRequest,
     MarketingResponse,

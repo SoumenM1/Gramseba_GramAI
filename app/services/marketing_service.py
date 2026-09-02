@@ -1,12 +1,11 @@
+from app.ai.marketing.generator import MarketingGenerator
 from app.schemas.marketing import (
     MarketingRequest,
     MarketingResponse,
 )
-from app.ai.marketing.generator import MarketingGenerator
 
 
 class MarketingService:
-
     def __init__(self):
         self.generator = MarketingGenerator()
 
@@ -15,6 +14,4 @@ class MarketingService:
         request: MarketingRequest,
     ) -> MarketingResponse:
 
-        return await self.generator.generate(
-            request
-        )
+        return await self.generator.generate(request)

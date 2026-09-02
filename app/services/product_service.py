@@ -1,5 +1,5 @@
-from app.repositories.product_repository import ProductRepository
 from app.core.exceptions import ProductNotFoundException
+from app.repositories.product_repository import ProductRepository
 
 
 class ProductService:

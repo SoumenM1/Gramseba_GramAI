@@ -1,5 +1,8 @@
+
 from datetime import datetime, timedelta, timezone
-from jose import jwt
+
+import jwt
+
 from app.core.config import settings
 
 
@@ -9,7 +12,7 @@ def create_access_token(
 ) -> str:
     payload = data.copy()
 
-    expire = datetime.now(timezone.utc) + timedelta(
+    expire = datetime.now(timezone.UTC) + timedelta(
         minutes=expires_minutes
     )
 
