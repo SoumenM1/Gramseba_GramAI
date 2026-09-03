@@ -22,7 +22,7 @@ class GramAIAgent:
         )
 
         result = await self.executor.execute(
-            plan=plan,
+            plan= {"type": "general_chat", "requires_database": False},
             user_id=user_id,
             message=message,
         )

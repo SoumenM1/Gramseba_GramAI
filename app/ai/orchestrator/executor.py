@@ -17,6 +17,7 @@ class Executor:
         plan: dict,
         user_id: str,
         message: str,
+        
     ):
 
         if plan["type"] == "seller_search":
