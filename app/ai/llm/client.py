@@ -2,7 +2,7 @@ import json
 import logging
 import httpx
 
-from app.ai.llm.prompts import GENERAL_CHAT_PROMPT
+from app.ai.llm.prompts import SYSTEM_PROMPT_ONE,SYSTEM_PROMPT_TWO
 from app.core.config import settings
 from app.core.exceptions import AIServiceException
 
@@ -20,7 +20,7 @@ class LLMClient:
             "messages": [
                 {
                     "role": "system",
-                    "content": GENERAL_CHAT_PROMPT,
+                    "content": SYSTEM_PROMPT_TWO,
                 },
                 {
                     "role": "user",
