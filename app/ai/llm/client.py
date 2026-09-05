@@ -1,45 +1,71 @@
-import httpx
+import json
 import logging
+import httpx
+
 from app.ai.llm.prompts import GENERAL_CHAT_PROMPT
 from app.core.config import settings
 from app.core.exceptions import AIServiceException
 
 
+logger = logging.getLogger(__name__)
+
+
 class LLMClient:
+    async def generate(self, prompt: str):
 
-    async def generate(
-        self,
-        prompt: str,
-    ) -> str:
-
-        url = (
-            f"{settings.OLLAMA_URL}/api/chat"
-        )
+        url = f"{settings.OLLAMA_URL}/api/chat"
 
         payload = {
             "model": settings.OLLAMA_MODEL,
-            "messages": [{"role": "system", "content": GENERAL_CHAT_PROMPT}, {"role": "user", "content": prompt}],
-            "stream": False,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": GENERAL_CHAT_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            "stream": True,
         }
 
         try:
-            async with httpx.AsyncClient(
-                timeout=120
-            ) as client:
-
-                response = await client.post(
+            async with httpx.AsyncClient(timeout=None) as client:
+                async with client.stream(
+                    "POST",
                     url,
                     json=payload,
-                )
+                ) as response:
+                    response.raise_for_status()
 
-                response.raise_for_status()
+                    async for line in response.aiter_lines():
+                        if not line:
+                            continue
 
-                data = response.json()
-            logging.info(f"LLM response: {data}")
-            
-            return data.get("message", {}).get("content", "")
-        
+                        try:
+                            data = json.loads(line)
+
+                            content = data.get("message", {}).get("content", "")
+
+                            if content:
+                                yield content
+
+                            if data.get("done"):
+                                break
+
+                        except json.JSONDecodeError:
+                            logger.warning(
+                                "Invalid Ollama response: %s",
+                                line,
+                            )
+
+        except httpx.HTTPError as exc:
+            logger.exception("Ollama HTTP request failed")
+
+            raise AIServiceException(f"LLM request failed: {exc}") from exc
+
         except Exception as exc:
-            raise AIServiceException(
-                f"LLM request failed: {exc}"
-            )
+            logger.exception("Ollama streaming failed")
+
+            raise AIServiceException(f"LLM streaming failed: {exc}") from exc

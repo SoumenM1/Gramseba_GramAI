@@ -1,3 +1,4 @@
+
 from app.ai.orchestrator.planner import Planner
 from app.ai.orchestrator.executor import Executor
 from app.ai.guardrails.input_guard import validate_input
@@ -17,14 +18,13 @@ class GramAIAgent:
 
         validate_input(message)
 
-        plan = await self.planner.create_plan(
-            message
-        )
+        # Planner is still normal request/response
+        plan = await self.planner.create_plan(message)
 
-        result = await self.executor.execute(
+        # Executor is STREAMING
+        async for event in self.executor.execute(
             plan=plan,
             user_id=user_id,
             message=message,
-        )
-
-        return result
+        ):
+            yield event
